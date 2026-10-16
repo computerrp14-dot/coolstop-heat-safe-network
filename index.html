@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1a5250">
+<title>CoolStop – Heat-Safe Worker Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal-50:#eef7f6;--teal-100:#d3ebe8;--teal-200:#a7d7d2;--teal-500:#2b817b;
+  --teal-600:#1e6763;--teal-700:#1a5250;--teal-800:#164140;
+  --green-50:#f0f8f1;--green-200:#bae0c1;--green-700:#1f5c31;
+  --amber-50:#fff8eb;--amber-100:#ffedc7;--amber-200:#ffd98a;--amber-300:#ffc04d;
+  --amber-500:#f98507;--amber-600:#dd5f02;--amber-900:#7a2b0d;
+  --red-50:#fef2f2;--red-200:#fecaca;--red-600:#dc2626;--red-700:#b91c1c;
+  --cyan-50:#ecfeff;--cyan-200:#a5f3fc;--cyan-800:#155e75;
+  --ink:#0f172a;--ink-2:#334155;--muted:#64748b;--muted-2:#94a3b8;
+  --line:#e2e8f0;--line-2:#cbd5e1;--bg:#f8fafc;--white:#fff;
+  --shadow:0 1px 2px rgba(15,23,42,.04),0 6px 18px -8px rgba(15,23,42,.12);
+  --radius:16px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p,ul{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+:focus-visible{outline:2px solid var(--teal-500);outline-offset:2px;border-radius:6px}
+
+.app{display:flex;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:264px;background:#fff;border-right:1px solid var(--line);padding:20px 16px;display:none;flex-direction:column;gap:20px;overflow-y:auto;z-index:30}
+.sidebar-note{margin-top:auto;background:var(--amber-50);border:1px solid var(--amber-200);border-radius:12px;padding:12px;font-size:12px;color:var(--amber-900)}
+.sidebar-note b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;margin-bottom:4px}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+@media(min-width:1024px){.sidebar{display:flex}.main{margin-left:264px}}
+
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+@media(min-width:1024px){.topbar{display:none}}
+.menu-btn{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line-2);background:#fff;border-radius:12px;color:var(--ink-2);font-size:20px;line-height:1}
+.mobile-menu{display:none;border-bottom:1px solid var(--line);background:#fff;padding:12px}
+.mobile-menu.open{display:block}
+@media(min-width:1024px){.mobile-menu{display:none!important}}
+
+.container{max-width:1200px;margin:0 auto;padding:24px 16px;width:100%}
+@media(min-width:1024px){.container{padding:28px 24px}}
+
+.brand{display:flex;align-items:center;gap:10px;padding:4px}
+.brand-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--teal-700);flex-shrink:0}
+.brand-text{display:flex;flex-direction:column;line-height:1}
+.brand-text b{font-size:17px;font-weight:800;letter-spacing:-.02em;color:var(--teal-800)}
+.brand-text small{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-top:3px}
+
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:600;color:var(--ink-2);transition:background .15s,color .15s;cursor:pointer}
+.nav a:hover{background:var(--teal-50);color:var(--teal-800)}
+.nav a.active{background:var(--teal-700);color:#fff;box-shadow:var(--shadow)}
+
+.page-head{margin-bottom:20px}
+.page-head h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.page-head p{color:var(--muted);font-size:14px;margin-top:4px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.card-head-left{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.card-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--teal-50);color:var(--teal-700);flex-shrink:0;font-size:18px}
+.card-title{font-size:16px;font-weight:700;color:var(--ink);line-height:1.3}
+.card-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:1fr}
+.grid-4{grid-template-columns:repeat(2,1fr)}
+@media(min-width:768px){.grid-2{grid-template-columns:1fr 1fr}.grid-4{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1024px){.split{grid-template-columns:minmax(0,380px) minmax(0,1fr)}}
+
+.hero{border-radius:var(--radius);padding:26px 22px;color:#fff;background:linear-gradient(135deg,var(--teal-700),var(--green-700));box-shadow:var(--shadow)}
+@media(min-width:640px){.hero{padding:34px 30px}}
+.hero h1{font-size:32px;font-weight:800;letter-spacing:-.03em;margin-top:14px;color:#fff}
+@media(min-width:640px){.hero h1{font-size:40px}}
+.hero .tagline{font-size:17px;font-weight:600;margin-top:6px;color:rgba(255,255,255,.95)}
+.hero p.lead{font-size:14px;margin-top:12px;max-width:640px;color:rgba(255,255,255,.88);line-height:1.6}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.stat-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stat-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.stat-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:12px;flex-shrink:0;font-size:16px}
+.stat-value{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px;color:var(--ink)}
+.stat-hint{font-size:12px;color:var(--muted);margin-top:2px}
+
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid var(--line);background:#f1f5f9;color:var(--ink-2);line-height:1.4}
+.badge-teal{background:var(--teal-50);border-color:var(--teal-200);color:var(--teal-800)}
+.badge-green{background:var(--green-50);border-color:var(--green-200);color:var(--green-700)}
+.badge-amber{background:var(--amber-50);border-color:var(--amber-200);color:var(--amber-900)}
+.badge-red{background:var(--red-50);border-color:var(--red-200);color:var(--red-700)}
+.badge-cyan{background:var(--cyan-50);border-color:var(--cyan-200);color:var(--cyan-800)}
+.badge-slate{background:#f1f5f9;border-color:var(--line-2);color:var(--ink-2)}
+.demo-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;background:var(--amber-100);border:1px solid var(--amber-300);color:var(--amber-900)}
+.demo-badge::before{content:"⚠";font-size:12px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;border:1px solid transparent;transition:all .15s;line-height:1.2;cursor:pointer}
+.btn-primary{background:var(--teal-700);color:#fff;box-shadow:var(--shadow)}
+.btn-primary:hover{background:var(--teal-800)}
+.btn-secondary{background:#fff;border-color:var(--line-2);color:var(--ink-2)}
+.btn-secondary:hover{background:var(--teal-50);border-color:var(--teal-500);color:var(--teal-800)}
+.btn-amber{background:var(--amber-500);color:#fff;box-shadow:var(--shadow)}
+.btn-amber:hover{background:var(--amber-600)}
+.btn-white{background:#fff;color:var(--teal-800)}
+.btn-white:hover{background:var(--teal-50)}
+.btn-ghost{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.btn-sm{padding:7px 12px;font-size:12.5px}
+.btn-block{width:100%}
+
+.label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.input{width:100%;padding:10px 14px;border:1px solid var(--line-2);border-radius:12px;font-size:14px;background:#fff;color:var(--ink);transition:border .15s,box-shadow .15s;font-family:inherit}
+.input:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(43,129,123,.18)}
+.input.err{border-color:var(--red-600)}
+textarea.input{resize:vertical;min-height:96px}
+.field{margin-bottom:16px}
+.err-msg{color:var(--red-600);font-size:12px;font-weight:600;margin-top:5px}
+
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);background:#fff;color:var(--ink-2);font-size:12.5px;font-weight:600;transition:all .15s;cursor:pointer}
+.chip:hover{background:#f8fafc}
+.chip.active{background:var(--teal-700);border-color:var(--teal-700);color:#fff}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+
+.tile-grid{display:grid;gap:8px;grid-template-columns:1fr}
+@media(min-width:640px){.tile-grid{grid-template-columns:1fr 1fr}}
+.tile{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600;color:var(--ink-2);transition:all .15s;cursor:pointer}
+.tile:hover{border-color:var(--teal-500);background:#fafdfd}
+.tile.active{border-color:var(--teal-500);background:var(--teal-50);color:var(--teal-800);box-shadow:0 0 0 1px var(--teal-500) inset}
+
+.info-box,.warn-box,.ok-box{border-radius:12px;padding:12px 14px;font-size:12.5px;line-height:1.55;display:flex;gap:10px;align-items:flex-start}
+.info-box{background:var(--teal-50);border:1px solid var(--teal-200);color:var(--teal-800)}
+.warn-box{background:var(--amber-50);border:1px solid var(--amber-200);color:var(--amber-900)}
+.ok-box{background:var(--green-50);border:1px solid var(--green-200);color:var(--green-700)}
+
+.facility-card{width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;transition:all .15s;cursor:pointer}
+.facility-card:hover{border-color:var(--teal-500);background:#fafdfd}
+.facility-card.active{border-color:var(--teal-500);background:var(--teal-50);box-shadow:0 0 0 1px var(--teal-500)}
+.facility-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--teal-700);color:#fff;flex-shrink:0;font-size:18px}
+.facility-body{min-width:0;flex:1}
+.facility-name{font-size:14px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.facility-area{font-size:12px;color:var(--muted);margin-top:2px;display:block}
+.facility-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.facility-time{font-size:11.5px;color:var(--muted-2);margin-top:6px;display:block}
+
+/* ===== STATIC DEMO MAP ===== */
+.map-wrap{
+  position:relative;
+  width:100%;
+  height:420px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  background:#eef2f5;
+}
+@media(min-width:1024px){.map-wrap{height:540px}}
+
+.demo-map{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:#e2e8f0;
+  overflow:hidden;
+}
+.demo-map img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  user-select:none;
+  pointer-events:none;
+}
+.map-pin{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  z-index:5;
+  cursor:pointer;
+  transition:transform .15s;
+  border:none;
+  padding:0;
+  background:transparent;
+}
+.map-pin:hover{transform:translate(-50%,-50%) scale(1.18);z-index:10}
+.map-pin__inner{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:3px solid #fff;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+}
+.map-pin.active .map-pin__inner{
+  outline:3px solid #ffc04d;
+  outline-offset:2px;
+  transform:scale(1.15);
+}
+.map-pin__label{
+  position:absolute;
+  left:50%;
+  top:100%;
+  transform:translateX(-50%);
+  margin-top:4px;
+  background:rgba(15,23,42,.9);
+  color:#fff;
+  font-size:10.5px;
+  font-weight:600;
+  padding:3px 7px;
+  border-radius:6px;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .15s;
+}
+.map-pin:hover .map-pin__label,
+.map-pin.active .map-pin__label{opacity:1}
+
+.map-legend{
+  position:absolute;
+  bottom:12px;
+  left:12px;
+  z-index:20;
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--ink-2);
+  box-shadow:0 2px 8px rgba(15,23,42,.15);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-width:200px;
+}
+.map-legend-title{
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-size:10px;
+  color:var(--muted);
+  font-weight:700;
+}
+.map-legend-row{display:flex;align-items:center;gap:8px}
+.map-legend-dot{
+  width:14px;height:14px;border-radius:999px;border:2px solid #fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);flex-shrink:0;
+}
+.map-status{
+  position:absolute;
+  top:12px;
+  left:12px;
+  z-index:20;
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:6px 10px;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--ink-2);
+  box-shadow:0 2px 8px rgba(15,23,42,.12);
+}
+
+.report-item{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.report-main{padding:16px;display:flex;flex-direction:column;gap:12px}
+@media(min-width:768px){.report-main{flex-direction:row;align-items:flex-start;justify-content:space-between}}
+.report-left{min-width:0;flex:1}
+.report-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.report-area{font-size:14px;font-weight:700;color:var(--ink);margin-top:8px}
+.report-meta{font-size:11.5px;color:var(--muted-2);margin-top:8px}
+.report-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.icon-btn{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;border:1px solid var(--line-2);background:#fff;color:var(--muted);transition:all .15s;cursor:pointer;font-size:16px}
+.icon-btn:hover{border-color:var(--red-200);background:var(--red-50);color:var(--red-600)}
+.report-toggle{width:100%;padding:10px 16px;border:none;border-top:1px solid var(--line);background:#fafafa;font-size:12.5px;font-weight:600;color:var(--teal-700);display:flex;justify-content:space-between;align-items:center;text-align:left;cursor:pointer}
+.report-toggle:hover{background:var(--teal-50)}
+.report-details{padding:14px 16px;border-top:1px solid var(--line);background:#f8fafc}
+.report-details ul{font-size:12.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+.report-details li{display:flex;gap:8px;align-items:flex-start}
+.report-details li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal-500);flex-shrink:0;margin-top:7px}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 24px;border:1px dashed var(--line-2);border-radius:var(--radius);background:#f8fafc}
+.empty-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#fff;color:var(--muted-2);box-shadow:var(--shadow);font-size:22px}
+.empty h3{font-size:14px;font-weight:700;margin-top:12px;color:var(--ink)}
+.empty p{font-size:13px;color:var(--muted);margin-top:4px;max-width:340px}
+
+.footer{margin-top:40px;padding:20px 0 8px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--muted)}
+.footer b{color:var(--ink-2)}
+
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mt-5{margin-top:20px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.between{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.text-sm{font-size:13px}.text-xs{font-size:12px}.muted{color:var(--muted)}
+.scroll-y{max-height:520px;overflow-y:auto;padding-right:4px}
+.scroll-y::-webkit-scrollbar{width:8px}
+.scroll-y::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .3s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <header class="topbar">
+      <div id="topbarBrand"></div>
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+    </header>
+    <div class="mobile-menu" id="mobileMenu"></div>
+
+    <div class="container">
+
+      <!-- HOME -->
+      <section class="page active" id="page-home">
+        <div class="hero">
+          <span class="badge badge-amber">Super El Niño · Protect Nature, Protect Life</span>
+          <h1>CoolStop</h1>
+          <p class="tagline">Find shade. Find water. Stay safer.</p>
+          <p class="lead">Outdoor workers — construction crews, road workers, delivery riders and street vendors — can face dangerous heat with nowhere to rest. CoolStop maps nearby relief facilities and lets workers report where shade, water and cooling are missing.</p>
+          <div class="hero-actions">
+            <button class="btn btn-white" onclick="go('find')">📍 Find shade &amp; water</button>
+            <button class="btn btn-amber" onclick="go('report')">⚠ Report an issue</button>
+            <button class="btn btn-ghost" onclick="go('employer')">📊 Employer dashboard</button>
+          </div>
+        </div>
+
+        <div class="between mt-5 mb-3">
+          <h2 class="card-title">At a glance</h2>
+          <span class="demo-badge">Demonstration data</span>
+        </div>
+        <div class="grid grid-4" id="stats"></div>
+
+        <div class="grid grid-2 mt-5">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-head-left">
+                <span class="card-icon">🌡</span>
+                <div><h3 class="card-title">Heat-risk information</h3>
+                <p class="card-sub">Illustrative snapshot used by the priority prototype</p></div>
+              </div>
+              <span class="demo-badge">Demo</span>
+            </div>
+            <span class="badge badge-amber" id="heatBadge"></span>
+            <p class="mt-3" style="font-size:14px;font-weight:600" id="heatHeadline"></p>
+            <p class="mt-2 text-sm muted" id="heatDetail"></p>
+            <ul class="mt-4" id="heatGuidance" style="font-size:13.5px;display:flex;flex-direction:column;gap:8px"></ul>
+            <button class="btn btn-secondary btn-sm mt-4" onclick="go('heat-safety')">Read the heat-safety guidance →</button>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-head-left">
+                <span class="card-icon">✨</span>
+                <div><h3 class="card-title">Quick actions</h3>
+                <p class="card-sub">Everything works offline</p></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="facility-card" onclick="go('find','shade')">
+                <span class="facility-icon" style="background:#1f5c31">🌳</span>
+                <span class="facility-body"><span class="facility-name">Find shade</span><span class="facility-area">Shelters and shaded rest points</span></span>
+              </button>
+              <button class="facility-card" onclick="go('find','water')">
+                <span class="facility-icon" style="background:#0e7490">💧</span>
+                <span class="facility-body"><span class="facility-name">Find water</span><span class="facility-area">Drinking-water points and kiosks</span></span>
+              </button>
+              <button class="facility-card" onclick="go('report')">
+                <span class="facility-icon" style="background:#f98507">⚠</span>
+                <span class="facility-body"><span class="facility-name">Report an issue</span><span class="facility-area">Missing shade, no water, cooling closed</span></span>
+              </button>
+              <button class="facility-card" onclick="go('employer')">
+                <span class="facility-icon">📊</span>
+                <span class="facility-body"><span class="facility-name">Employer dashboard</span><span class="facility-area">See where facilities are missing</span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FIND -->
+      <section class="page" id="page-find">
+        <div class="page-head">
+          <h1>Find shade &amp; water</h1>
+          <p>Demo map of demonstration facilities. Click any pin or list item for details.</p>
+        </div>
+
+        <div class="warn-box mb-4">
+          <span>⚠</span>
+          <span>Every facility below is <b>invented for this prototype</b>. Nothing here confirms a real facility is open, verified or safe.</span>
+        </div>
+
+        <div class="grid split">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <label class="label" for="q">Search by name, area or note</label>
+              <input class="input" id="q" type="search" placeholder="e.g. water, Sitabuldi, shade">
+              <div class="mt-4">
+                <span class="label">Filter by facility type</span>
+                <div class="chip-row" id="typeChips"></div>
+              </div>
+              <p class="mt-4 text-xs muted" id="countLabel"></p>
+            </div>
+            <ul class="scroll-y" id="list" style="display:flex;flex-direction:column;gap:10px"></ul>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="map-wrap">
+              <div class="demo-map" id="demoMap">
+                <img src="demo-map.jpg" alt="CoolStop demo map"
+                     onerror="this.style.display='none';this.parentElement.style.background='#e2e8f0';this.parentElement.innerHTML+='&lt;div style=&quot;position:absolute;inset:0;display:grid;place-items:center;color:#64748b;font-size:14px;text-align:center;padding:20px&quot;&gt;⚠ Save your map image as &lt;b style=color:#0f172a&gt;demo-map.jpg&lt;/b&gt; in the same folder as this HTML file, then refresh.&lt;/div&gt;'">
+                <div class="map-status" id="mapStatus">Demo map loaded · 10 pins</div>
+                <div class="map-legend">
+                  <div class="map-legend-title">Legend (demo)</div>
+                  <div class="map-legend-row"><span class="map-legend-dot" style="background:#1f5c31"></span>Shade / shelter</div>
+                  <div class="map-legend-row"><span class="map-legend-dot" style="background:#0e7490"></span>Drinking water</div>
+                  <div class="map-legend-row"><span class="map-legend-dot" style="background:#2b817b"></span>Cooling station</div>
+                  <div class="map-legend-row"><span class="map-legend-dot" style="background:#dc2626"></span>First-aid</div>
+                </div>
+              </div>
+            </div>
+            <div id="details"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORT -->
+      <section class="page" id="page-report">
+        <div class="page-head">
+          <h1>Report a heat-safety problem</h1>
+          <p>Saved in this browser only. Nothing is transmitted to any employer or authority.</p>
+        </div>
+
+        <div class="info-box mb-4">
+          <span>ℹ</span>
+          <span>Reports are stored in your browser’s <b>LocalStorage</b>. They are <b>not</b> sent anywhere.</span>
+        </div>
+
+        <div id="flash"></div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <form id="reportForm" novalidate>
+              <fieldset style="border:none;padding:0;margin:0 0 16px">
+                <legend class="label">Issue category *</legend>
+                <div class="tile-grid" id="catTiles">
+                  <label class="tile active" data-cat="missing-shade">🌳 Missing shade</label>
+                  <label class="tile" data-cat="no-water">💧 Drinking water unavailable</label>
+                  <label class="tile" data-cat="cooling-closed">❄ Cooling station closed</label>
+                  <label class="tile" data-cat="other">⚠ Other heat-safety concern</label>
+                </div>
+              </fieldset>
+
+              <div class="field">
+                <label class="label" for="area">Location or area description *</label>
+                <input class="input" id="area" type="text" placeholder="e.g. Kamptee Road near the flyover">
+                <div class="err-msg" id="areaErr" style="display:none"></div>
+              </div>
+
+              <fieldset style="border:none;padding:0;margin:0 0 16px">
+                <legend class="label">Severity *</legend>
+                <div class="chip-row" id="sevChips">
+                  <button type="button" class="chip" data-sev="low">Low</button>
+                  <button type="button" class="chip active" data-sev="medium">Medium</button>
+                  <button type="button" class="chip" data-sev="high">High</button>
+                </div>
+              </fieldset>
+
+              <div class="field">
+                <label class="label" for="notes">Notes (optional)</label>
+                <textarea class="input" id="notes" rows="4" placeholder="Time of day, who is affected, what you already tried."></textarea>
+                <div class="text-xs muted mt-2" style="text-align:right" id="noteCount">0/400</div>
+              </div>
+
+              <button class="btn btn-primary btn-block" type="submit">📨 Submit demo report</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-head-left">
+                <span class="card-icon">📋</span>
+                <div><h3 class="card-title">Your reports</h3>
+                <p class="card-sub">Stored in this browser only</p></div>
+              </div>
+              <span class="badge badge-teal" id="reportCount">0 total</span>
+            </div>
+            <ul id="myList" class="scroll-y" style="display:flex;flex-direction:column;gap:12px"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- EMPLOYER -->
+      <section class="page" id="page-employer">
+        <div class="between mb-4">
+          <div class="page-head" style="margin-bottom:0">
+            <h1>Employer dashboard</h1>
+            <p>Where are shade, water and cooling facilities missing?</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="resetBtn">↻ Reset demo data</button>
+        </div>
+
+        <div class="warn-box mb-4">
+          <span>⚠</span>
+          <span><b>Demonstration prototype.</b> Does not contact real employers.</span>
+        </div>
+
+        <div class="grid grid-4" id="empStats"></div>
+
+        <div class="grid grid-2 mt-5">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-head-left">
+                <span class="card-icon">📊</span>
+                <div><h3 class="card-title">Issues by category</h3>
+                <p class="card-sub">Counts from current demo reports</p></div>
+              </div>
+              <span class="demo-badge">Demo</span>
+            </div>
+            <div style="position:relative;height:260px"><canvas id="chart"></canvas></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-head-left">
+                <span class="card-icon">🎛</span>
+                <div><h3 class="card-title">Filters</h3><p class="card-sub">Narrow the report list</p></div>
+              </div>
+            </div>
+            <span class="label">Category</span>
+            <div class="chip-row mb-4" id="catChips"></div>
+            <span class="label">Status</span>
+            <div class="chip-row" id="statChips"></div>
+          </div>
+        </div>
+
+        <div class="between mt-5 mb-3">
+          <h2 class="card-title">Reports (priority order)</h2>
+          <span class="text-xs muted" id="shownCount">0 shown</span>
+        </div>
+        <ul id="reportList" style="display:flex;flex-direction:column;gap:12px"></ul>
+      </section>
+
+      <!-- PRIORITY -->
+      <section class="page" id="page-priority">
+        <div class="page-head">
+          <h1>AI-assisted priority prototype</h1>
+          <p>Transparent, rule-based scoring with a full explanation for every score.</p>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-head">
+            <div class="card-head-left">
+              <span class="card-icon">✨</span>
+              <div><h3 class="card-title">How scoring works</h3>
+              <p class="card-sub">Rule-based, not machine learning</p></div>
+            </div>
+            <span class="demo-badge">Rule-based, not ML</span>
+          </div>
+          <div class="info-box mb-4">
+            <span>ℹ</span>
+            <span>This is <b>not</b> a trained machine-learning model. It is a simple weighted ruleset.</span>
+          </div>
+          <div class="grid grid-4">
+            <div class="stat"><div class="stat-label">Severity</div><p class="text-sm mt-2">Low +10 · Medium +25 · High +40</p></div>
+            <div class="stat"><div class="stat-label">Category</div><p class="text-sm mt-2">Shade +20 · Water +25 · Cooling +20 · Other +10</p></div>
+            <div class="stat"><div class="stat-label">Heat risk</div><p class="text-sm mt-2">Low 0 · Moderate +10 · High +20 · Severe +30</p></div>
+            <div class="stat"><div class="stat-label">Recency &amp; status</div><p class="text-sm mt-2">Fresh +15 · Recent +8 · In progress −10 · Resolved −100</p></div>
+          </div>
+        </div>
+
+        <h2 class="card-title mb-3">Reports scored by priority</h2>
+        <ul id="priorityList" style="display:flex;flex-direction:column;gap:12px"></ul>
+      </section>
+
+      <!-- HEAT SAFETY -->
+      <section class="page" id="page-heat-safety">
+        <div class="page-head">
+          <h1>Heat safety</h1>
+          <p>Practical steps for outdoor workers during extreme heat.</p>
+        </div>
+
+        <div class="card mb-4">
+          <p class="text-sm muted">Heat risk depends on local temperature, humidity, wind, direct sun, workload and personal factors. Always follow your workplace heat-safety plan and official local guidance.</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h2 class="card-title mb-3">Everyday habits</h2>
+            <ul class="text-sm" style="display:flex;flex-direction:column;gap:10px;color:#334155">
+              <li>🟠 Take <b>short, frequent rest breaks in shade</b> — better than one long break.</li>
+              <li>🟠 Drink water regularly, <b>before you feel thirsty</b>.</li>
+              <li>🟠 Wear light, loose clothing and a hat.</li>
+              <li>🟠 Schedule the heaviest tasks earlier or later when possible.</li>
+              <li>🟠 Watch out for colleagues.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2 class="card-title mb-3">Recognise heat illness</h2>
+            <ul class="text-sm" style="display:flex;flex-direction:column;gap:10px;color:#334155">
+              <li>🔴 <b>Heat exhaustion</b>: heavy sweating, weakness, dizziness, nausea, headache, muscle cramps.</li>
+              <li>🔴 <b>Heat stroke (emergency)</b>: hot dry skin OR heavy sweating, confusion, slurred speech, fainting, seizures.</li>
+              <li>🔴 Move to shade, cool the person, give water if conscious.</li>
+            </ul>
+            <div class="badge badge-red mt-4" style="padding:12px;font-size:12.5px;line-height:1.5;border-radius:12px">
+              ⚠ <b>If you suspect heat stroke, call emergency services immediately.</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="page" id="page-about">
+        <div class="page-head">
+          <h1>About CoolStop &amp; impact</h1>
+          <p>Why we built this, who it helps, and how it relates to the competition theme.</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h2 class="card-title mb-3">The problem</h2>
+            <p class="text-sm" style="color:#334155">Outdoor workers spend long hours in extreme heat with few places to rest. Shade, drinking water and cooling rooms are often missing, hard to find, or unmarked.</p>
+          </div>
+          <div class="card">
+            <h2 class="card-title mb-3">Our solution</h2>
+            <p class="text-sm" style="color:#334155">CoolStop maps nearby relief facilities and lets workers report where shade, water or cooling is missing, so employers can prioritise action.</p>
+          </div>
+          <div class="card">
+            <h2 class="card-title mb-3">Intended users</h2>
+            <ul class="text-sm" style="display:flex;flex-direction:column;gap:8px;color:#334155">
+              <li>• Outdoor workers looking for shade, water or a rest point.</li>
+              <li>• Site supervisors planning rest schedules.</li>
+              <li>• Municipal teams and NGOs mapping heat-relief gaps.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2 class="card-title mb-3">Impact</h2>
+            <ul class="text-sm" style="display:flex;flex-direction:column;gap:8px;color:#334155">
+              <li>• Fewer heat-related illnesses.</li>
+              <li>• Better use of existing relief facilities.</li>
+              <li>• Data for tree planting and water-point planning.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card mt-5">
+          <h2 class="card-title mb-3">Theme link</h2>
+          <p class="text-sm" style="color:#334155">“Super El Niño: Protect Nature, Protect Life” highlights how extreme climate patterns threaten both ecosystems and the people who depend on them. CoolStop focuses on the human side — outdoor workers are among the first to feel extreme heat.</p>
+        </div>
+
+        <div class="card mt-5">
+          <h2 class="card-title mb-3">Limitations</h2>
+          <ul class="text-sm" style="display:flex;flex-direction:column;gap:8px;color:#334155">
+            <li>• All facilities, heat-risk values and starting reports are <b>invented demonstration data</b>.</li>
+            <li>• Reports are stored <b>only in your browser</b> and are <b>not sent</b> anywhere.</li>
+            <li>• Heat-risk examples are <b>not</b> official alerts.</li>
+            <li>• Priority engine is a <b>rule-based prototype</b>, not ML.</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        CoolStop · Student prototype for <b>“Super El Niño: Protect Nature, Protect Life”</b> · Not an official service.
+      </footer>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+/* ================== DATA (x/y are % positions on the image) ================== */
+const FACILITIES = [
+  {id:'FAC-01',name:'Zero Mile Shade Pavilion (demo)',type:'shade',area:'Zero Mile',x:30,y:62,availability:'Example 08:00–19:00',accessibility:'Step-free entrance',lastReportedHoursAgo:5,verification:'community',notes:'Invented record.'},
+  {id:'FAC-02',name:'Sitabuldi Water Point (demo)',type:'water',area:'Sitabuldi Market',x:52,y:52,availability:'Example 07:00–21:00',accessibility:'Ground level',lastReportedHoursAgo:2,verification:'community',notes:'Invented record.'},
+  {id:'FAC-03',name:'Variety Square Cooling (demo)',type:'cooling',area:'Variety Square',x:72,y:40,availability:'Example 10:00–18:00',accessibility:'Ramped entrance',lastReportedHoursAgo:30,verification:'unverified',notes:'Invented record.'},
+  {id:'FAC-04',name:'Civil Lines Rest Shelter (demo)',type:'shade',area:'Civil Lines',x:22,y:30,availability:'Example 09:00–18:00',accessibility:'Shaded walkway',lastReportedHoursAgo:52,verification:'unverified',notes:'Invented record.'},
+  {id:'FAC-05',name:'Ram Jhula First-Aid (demo)',type:'firstaid',area:'Ram Jhula',x:45,y:15,availability:'Example 08:00–20:00',accessibility:'Ground floor',lastReportedHoursAgo:12,verification:'community',notes:'Invented record.'},
+  {id:'FAC-06',name:'Mangalwari Water Kiosk (demo)',type:'water',area:'Mangalwari',x:58,y:70,availability:'Example 06:30–20:00',accessibility:'Kerb-side',lastReportedHoursAgo:9,verification:'community',notes:'Invented record.'},
+  {id:'FAC-07',name:'Dharampeth Bus Shade (demo)',type:'shade',area:'Dharampeth',x:15,y:72,availability:'Example 24 hours',accessibility:'Bench only',lastReportedHoursAgo:120,verification:'unverified',notes:'Invented record.'},
+  {id:'FAC-08',name:'Sadar Cooling Centre (demo)',type:'cooling',area:'Sadar',x:82,y:32,availability:'Example 11:00–17:00',accessibility:'Air-cooled hall',lastReportedHoursAgo:20,verification:'community',notes:'Invented record.'},
+  {id:'FAC-09',name:'Wardha Rd First-Aid (demo)',type:'firstaid',area:'Wardha Road',x:40,y:82,availability:'Example 07:00–19:00',accessibility:'Ramp access',lastReportedHoursAgo:48,verification:'unverified',notes:'Invented record.'},
+  {id:'FAC-10',name:'Kamptee Rd Water ATMs (demo)',type:'water',area:'Kamptee Road',x:78,y:15,availability:'Example 06:00–22:00',accessibility:'Two machines',lastReportedHoursAgo:3,verification:'community',notes:'Invented record.'}
+];
+
+const HEAT_RISK = {
+  level:'high',
+  headline:'Elevated heat risk in the demo snapshot',
+  detail:'Illustrative value only. Real heat risk depends on local temperature, humidity, wind, direct sun and personal factors.',
+  peakWindow:'Example peak window 13:00–16:00',
+  guidance:['Take short, frequent rest breaks in shade.','Drink water regularly — before you feel thirsty.','Schedule heavier tasks earlier or later.','Watch colleagues for signs of heat illness.']
+};
+
+const SEED_REPORTS = [
+  {id:'RPT-1001',category:'no-water',area:'Sitabuldi Market Road',severity:'high',notes:'Public tap reported dry.',createdAt:hoursAgoIso(6),status:'open',heatRiskAtReport:'high'},
+  {id:'RPT-1002',category:'missing-shade',area:'Wardha Road junction',severity:'medium',notes:'No shade along footpath.',createdAt:hoursAgoIso(28),status:'open',heatRiskAtReport:'moderate'},
+  {id:'RPT-1003',category:'cooling-closed',area:'Variety Square',severity:'medium',notes:'Cooling room locked.',createdAt:hoursAgoIso(50),status:'in-progress',heatRiskAtReport:'high'},
+  {id:'RPT-1004',category:'other',area:'Kamptee Road',severity:'low',notes:'One machine down.',createdAt:hoursAgoIso(96),status:'resolved',heatRiskAtReport:'moderate'},
+  {id:'RPT-1005',category:'missing-shade',area:'Dharampeth bus stop',severity:'high',notes:'Roof broken.',createdAt:hoursAgoIso(14),status:'open',heatRiskAtReport:'severe'}
+];
+
+const FACILITY_TYPE_LABEL={shade:'Shade / shelter',water:'Drinking water',cooling:'Cooling station',firstaid:'First-aid'};
+const FACILITY_TYPE_SHORT={shade:'S',water:'W',cooling:'C',firstaid:'F'};
+const FACILITY_TYPE_COLOR={shade:'#1f5c31',water:'#0e7490',cooling:'#2b817b',firstaid:'#dc2626'};
+const FACILITY_TYPE_CHIP={shade:'badge-green',water:'badge-cyan',cooling:'badge-teal',firstaid:'badge-red'};
+const FACILITY_ICON={shade:'🌳',water:'💧',cooling:'❄',firstaid:'❤'};
+const VERIFICATION_LABEL={verified:'Verified (demo)',community:'Community reported (demo)',unverified:'Unverified (demo)'};
+const VERIFICATION_CHIP={verified:'badge-green',community:'badge-teal',unverified:'badge-slate'};
+const CATEGORY_LABEL={'missing-shade':'Missing shade','no-water':'Drinking water unavailable','cooling-closed':'Cooling station closed','other':'Other heat-safety concern'};
+const CATEGORY_SHORT={'missing-shade':'Shade','no-water':'Water','cooling-closed':'Cooling','other':'Other'};
+const CATEGORY_CHIP={'missing-shade':'badge-green','no-water':'badge-cyan','cooling-closed':'badge-teal','other':'badge-slate'};
+const SEVERITY_LABEL={low:'Low',medium:'Medium',high:'High'};
+const SEVERITY_CHIP={low:'badge-slate',medium:'badge-amber',high:'badge-red'};
+const STATUS_LABEL={open:'Open','in-progress':'In progress',resolved:'Resolved'};
+const STATUS_CHIP={open:'badge-red','in-progress':'badge-amber',resolved:'badge-green'};
+const HEAT_LEVEL_LABEL={low:'Low',moderate:'Moderate',high:'High',severe:'Severe'};
+const HEAT_LEVEL_CHIP={low:'badge-green',moderate:'badge-amber',high:'badge-amber',severe:'badge-red'};
+const PRIORITY_CHIP={High:'badge-red',Medium:'badge-amber',Low:'badge-slate'};
+
+const REPORTS_KEY='coolstop.reports.v1';
+function getReports(){try{const r=localStorage.getItem(REPORTS_KEY);if(r)return JSON.parse(r);}catch(_){}
+  const c=SEED_REPORTS.map(r=>({...r}));localStorage.setItem(REPORTS_KEY,JSON.stringify(c));return c;}
+function saveReports(l){localStorage.setItem(REPORTS_KEY,JSON.stringify(l));window.dispatchEvent(new Event('coolstop:reports'));}
+function addReport(r){const l=getReports();l.unshift(r);saveReports(l);}
+function updateReportStatus(id,s){saveReports(getReports().map(r=>r.id===id?{...r,status:s}:r));}
+function deleteReportById(id){saveReports(getReports().filter(r=>r.id!==id));}
+function resetReports(){saveReports(SEED_REPORTS.map(r=>({...r})));}
+function makeReportId(){return 'RPT-'+Date.now().toString(36).toUpperCase();}
+
+const SEV_PTS={low:10,medium:25,high:40};
+const CAT_PTS={'missing-shade':20,'no-water':25,'cooling-closed':20,'other':10};
+const HEAT_PTS={low:0,moderate:10,high:20,severe:30};
+function scoreReport(r){
+  const reasons=[];
+  const s=SEV_PTS[r.severity]||0;reasons.push('+'+s+' — severity: '+(SEVERITY_LABEL[r.severity]||r.severity));
+  const c=CAT_PTS[r.category]||0;reasons.push('+'+c+' — category: '+(CATEGORY_LABEL[r.category]||r.category));
+  const h=HEAT_PTS[r.heatRiskAtReport]||0;reasons.push('+'+h+' — heat risk: '+(HEAT_LEVEL_LABEL[r.heatRiskAtReport]||r.heatRiskAtReport));
+  const ageH=(Date.now()-new Date(r.createdAt).getTime())/3600000;
+  let rec=0;if(ageH<24)rec=15;else if(ageH<72)rec=8;
+  reasons.push('+'+rec+' — recency');
+  let st=0;
+  if(r.status==='resolved'){st=-100;reasons.push('-100 — resolved');}
+  else if(r.status==='in-progress'){st=-10;reasons.push('-10 — in progress');}
+  else reasons.push('+0 — still open');
+  let score=s+c+h+rec+st;if(score<0)score=0;
+  const level=score>=75?'High':score>=45?'Medium':'Low';
+  return {score,level,reasons};
+}
+function sortByPriority(l){return [...l].sort((a,b)=>scoreReport(b).score-scoreReport(a).score);}
+
+function fmtRelative(iso){const t=new Date(iso).getTime();if(Number.isNaN(t))return 'unknown';const m=Math.round((Date.now()-t)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';const d=Math.round(h/24);if(d<30)return d+' d ago';return new Date(iso).toLocaleDateString();}
+function fmtDateTime(iso){const d=new Date(iso);if(Number.isNaN(d.getTime()))return 'unknown';return d.toLocaleString(undefined,{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function hoursAgoIso(h){return new Date(Date.now()-h*3600000).toISOString();}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function badge(t,c){return '<span class="badge '+(c||'')+'">'+esc(t)+'</span>';}
+
+/* ================== NAV ================== */
+const NAV=[
+  {id:'home',label:'Home',icon:'🏠'},
+  {id:'find',label:'Find Shade & Water',icon:'📍'},
+  {id:'report',label:'Report an Issue',icon:'⚠'},
+  {id:'employer',label:'Employer Dashboard',icon:'📊'},
+  {id:'priority',label:'Priority Engine',icon:'✨'},
+  {id:'heat-safety',label:'Heat Safety',icon:'🌡'},
+  {id:'about',label:'About & Impact',icon:'ℹ'}
+];
+function buildNav(el,onClick){
+  el.innerHTML=NAV.map(n=>'<a data-page="'+n.id+'">'+n.icon+' '+n.label+'</a>').join('');
+  el.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{go(a.dataset.page);if(onClick)onClick();}));
+}
+function go(page,type){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='find'){if(type){findState.activeTypes=[type];}renderFind();}
+  if(page==='employer') renderEmployer();
+  if(page==='priority') renderPriority();
+  if(page==='report')   renderMyReports();
+  if(page==='home')     renderHome();
+}
+
+/* ================== LAYOUT ================== */
+function injectSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML='<div class="brand"><span class="brand-mark">'+
+    '<svg viewBox="0 0 32 32" style="width:24px;height:24px"><circle cx="16" cy="12.5" r="5" fill="#ffc04d"/>'+
+    '<path d="M7 24a9 9 0 0 1 18 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>'+
+    '</span><span class="brand-text"><b>CoolStop</b><small>Heat-Safe Worker Network</small></span></div>'+
+    '<nav class="nav" id="navDesktop"></nav>'+
+    '<div class="sidebar-note"><b>Prototype</b><p>All data is demonstration data. Reports stay in your browser and are never sent anywhere.</p></div>';
+  buildNav(document.getElementById('navDesktop'));
+  const tb=document.getElementById('topbarBrand');
+  tb.innerHTML='<div class="brand"><span class="brand-mark">'+
+    '<svg viewBox="0 0 32 32" style="width:24px;height:24px"><circle cx="16" cy="12.5" r="5" fill="#ffc04d"/>'+
+    '<path d="M7 24a9 9 0 0 1 18 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>'+
+    '</span><span class="brand-text"><b>CoolStop</b><small>Heat-Safe</small></span></div>';
+  const mm=document.getElementById('mobileMenu');
+  mm.innerHTML='<nav class="nav" id="navMobile"></nav>';
+  buildNav(document.getElementById('navMobile'),()=>{mm.classList.remove('open');document.getElementById('menuBtn').textContent='☰';});
+}
+document.getElementById('menuBtn').addEventListener('click',()=>{
+  const mm=document.getElementById('mobileMenu');
+  const o=mm.classList.toggle('open');
+  document.getElementById('menuBtn').textContent=o?'✕':'☰';
+});
+
+/* ================== HOME ================== */
+function renderHome(){
+  const r=getReports();
+  const open=r.filter(x=>x.status==='open').length;
+  const un=r.filter(x=>x.status!=='resolved').length;
+  const res=r.length-un;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat-top"><span class="stat-label">Demo facilities</span>
+      <span class="stat-icon" style="background:#f0f8f1;color:#1f5c31">🌳</span></div>
+      <div class="stat-value">${FACILITIES.length}</div><div class="stat-hint">Invented map records</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Open reports</span>
+      <span class="stat-icon" style="background:#fef2f2;color:#dc2626">⚠</span></div>
+      <div class="stat-value">${open}</div><div class="stat-hint">Saved in your browser</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Unresolved</span>
+      <span class="stat-icon" style="background:#fff8eb;color:#b74106">💧</span></div>
+      <div class="stat-value">${un}</div><div class="stat-hint">Open + in progress</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Resolved</span>
+      <span class="stat-icon" style="background:#eef7f6;color:#1a5250">✅</span></div>
+      <div class="stat-value">${res}</div><div class="stat-hint">Marked done</div></div>`;
+  const hb=document.getElementById('heatBadge');
+  hb.textContent='Risk level: '+HEAT_LEVEL_LABEL[HEAT_RISK.level];
+  hb.className='badge '+HEAT_LEVEL_CHIP[HEAT_RISK.level];
+  document.getElementById('heatHeadline').textContent=HEAT_RISK.headline;
+  document.getElementById('heatDetail').textContent=HEAT_RISK.detail+' '+HEAT_RISK.peakWindow+'.';
+  document.getElementById('heatGuidance').innerHTML=HEAT_RISK.guidance.map(g=>
+    '<li style="display:flex;gap:8px;align-items:flex-start;color:#334155"><span style="width:6px;height:6px;border-radius:50%;background:#ffa621;flex-shrink:0;margin-top:7px"></span><span>'+esc(g)+'</span></li>').join('');
+}
+
+/* ================== FIND (STATIC MAP) ================== */
+const findState={activeTypes:[],query:'',selectedId:null};
+
+function renderTypeChips(){
+  const TYPES=['shade','water','cooling','firstaid'];
+  const el=document.getElementById('typeChips');
+  el.innerHTML='<button class="chip '+(findState.activeTypes.length===0?'active':'')+'" data-t="all">All types</button>'+
+    TYPES.map(t=>'<button class="chip '+(findState.activeTypes.includes(t)?'active':'')+'" data-t="'+t+'">'+FACILITY_TYPE_LABEL[t]+'</button>').join('');
+  el.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+    const t=b.dataset.t;
+    if(t==='all')findState.activeTypes=[];
+    else if(findState.activeTypes.includes(t))findState.activeTypes=findState.activeTypes.filter(x=>x!==t);
+    else findState.activeTypes=[...findState.activeTypes,t];
+    renderFind();
+  }));
+}
+function filteredFacilities(){
+  const q=findState.query.trim().toLowerCase();
+  return FACILITIES.filter(f=>{
+    const tOk=findState.activeTypes.length===0||findState.activeTypes.includes(f.type);
+    const xOk=!q||f.name.toLowerCase().includes(q)||f.area.toLowerCase().includes(q)||f.notes.toLowerCase().includes(q);
+    return tOk&&xOk;
+  });
+}
+function renderMapPins(list){
+  const map=document.getElementById('demoMap');
+  /* remove existing pins only (keep image, legend, status) */
+  map.querySelectorAll('.map-pin').forEach(p=>p.remove());
+  list.forEach(f=>{
+    const btn=document.createElement('button');
+    btn.className='map-pin'+(f.id===findState.selectedId?' active':'');
+    btn.style.left=f.x+'%';
+    btn.style.top=f.y+'%';
+    btn.setAttribute('aria-label',f.name);
+    btn.innerHTML='<div class="map-pin__inner" style="background:'+FACILITY_TYPE_COLOR[f.type]+'">'+
+      FACILITY_TYPE_SHORT[f.type]+'</div>'+
+      '<div class="map-pin__label">'+esc(f.name)+'</div>';
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      findState.selectedId=(findState.selectedId===f.id)?null:f.id;
+      renderFind();
+    });
+    map.appendChild(btn);
+  });
+  /* update the status pill */
+  const status=document.getElementById('mapStatus');
+  if(status) status.textContent='Demo map · '+list.length+' pin'+(list.length===1?'':'s');
+}
+function renderFind(){
+  renderTypeChips();
+  const list=filteredFacilities();
+  document.getElementById('countLabel').textContent='Showing '+list.length+' of '+FACILITIES.length+' demo facilities';
+  const el=document.getElementById('list');
+  if(list.length===0){
+    el.innerHTML='<li class="empty"><div class="empty-icon">🔎</div><h3>No facilities match</h3><p>Try clearing the search or selecting “All types”.</p></li>';
+  } else {
+    el.innerHTML=list.map(f=>{
+      const active=f.id===findState.selectedId?' active':'';
+      const iso=hoursAgoIso(f.lastReportedHoursAgo);
+      return `<li><button class="facility-card${active}" data-id="${f.id}">
+        <span class="facility-icon" style="background:${FACILITY_TYPE_COLOR[f.type]}">${FACILITY_ICON[f.type]}</span>
+        <span class="facility-body">
+          <span class="facility-name">${esc(f.name)}</span>
+          <span class="facility-area">📍 ${esc(f.area)}</span>
+          <span class="facility-tags">${badge(FACILITY_TYPE_LABEL[f.type],FACILITY_TYPE_CHIP[f.type])} ${badge(VERIFICATION_LABEL[f.verification],VERIFICATION_CHIP[f.verification])}</span>
+          <span class="facility-time">⏱ Last reported ${fmtRelative(iso)}</span>
+        </span></button></li>`;
+    }).join('');
+    el.querySelectorAll('.facility-card').forEach(b=>b.addEventListener('click',()=>{
+      const id=b.dataset.id;
+      findState.selectedId=(findState.selectedId===id)?null:id;
+      renderFind();
+    }));
+  }
+  renderMapPins(list);
+  renderFindDetails();
+}
+function renderFindDetails(){
+  const box=document.getElementById('details');
+  const f=FACILITIES.find(x=>x.id===findState.selectedId);
+  if(!f){
+    box.innerHTML='<div class="card"><p class="text-sm muted">📍 Select a marker or list item to see facility details here.</p></div>';
+    return;
+  }
+  const iso=hoursAgoIso(f.lastReportedHoursAgo);
+  const dir='https://www.openstreetmap.org/?mlat='+f.lat+'&mlon='+f.lng+'#map=17/'+f.lat+'/'+f.lng;
+  box.innerHTML=`
+    <div class="card">
+      <div class="card-head">
+        <div class="card-head-left">
+          <span class="card-icon" style="background:${FACILITY_TYPE_COLOR[f.type]};color:#fff">${FACILITY_ICON[f.type]}</span>
+          <div><h3 class="card-title">${esc(f.name)}</h3><p class="card-sub">📍 ${esc(f.area)}</p></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="findState.selectedId=null;renderFind();">Close</button>
+      </div>
+      <div class="row mb-4">${badge(FACILITY_TYPE_LABEL[f.type],FACILITY_TYPE_CHIP[f.type])} ${badge(VERIFICATION_LABEL[f.verification],VERIFICATION_CHIP[f.verification])} <span class="demo-badge">Demo facility</span></div>
+      <div style="font-size:14px;display:flex;flex-direction:column;gap:14px">
+        <div><div class="label" style="text-transform:uppercase;font-size:11px">Availability</div><div>${esc(f.availability)}</div></div>
+        <div><div class="label" style="text-transform:uppercase;font-size:11px">Accessibility</div><div>${esc(f.accessibility)}</div></div>
+        <div><div class="label" style="text-transform:uppercase;font-size:11px">Last reported</div><div>${fmtRelative(iso)} <span class="muted">(${fmtDateTime(iso)})</span></div></div>
+        <div><div class="label" style="text-transform:uppercase;font-size:11px">Notes</div><div>${esc(f.notes)}</div></div>
+      </div>
+      <div class="warn-box mt-4"><span>⚠</span><span>Invented demonstration data. Not verified.</span></div>
+    </div>`;
+}
+document.getElementById('q').addEventListener('input',e=>{findState.query=e.target.value;renderFind();});
+
+/* ================== REPORT ================== */
+const reportState={category:'missing-shade',severity:'medium'};
+function initReport(){
+  document.querySelectorAll('#catTiles .tile').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('#catTiles .tile').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    reportState.category=t.dataset.cat;
+  }));
+  document.querySelectorAll('#sevChips .chip').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('#sevChips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    reportState.severity=c.dataset.sev;
+  }));
+  const n=document.getElementById('notes');
+  n.addEventListener('input',()=>{
+    if(n.value.length>400)n.value=n.value.slice(0,400);
+    document.getElementById('noteCount').textContent=n.value.length+'/400';
+  });
+  document.getElementById('reportForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const area=document.getElementById('area').value.trim();
+    const errBox=document.getElementById('areaErr');
+    const input=document.getElementById('area');
+    if(!area||area.length<4){
+      errBox.textContent='Please describe the location (at least 4 characters).';
+      errBox.style.display='block';input.classList.add('err');return;
+    }
+    errBox.style.display='none';input.classList.remove('err');
+    const id=makeReportId();
+    addReport({
+      id,category:reportState.category,area,severity:reportState.severity,
+      notes:document.getElementById('notes').value.trim(),
+      createdAt:new Date().toISOString(),status:'open',heatRiskAtReport:HEAT_RISK.level
+    });
+    document.getElementById('flash').innerHTML='<div class="ok-box mb-4"><span>✅</span><span><b>Report saved locally as '+id+'.</b> This prototype does <b>not</b> contact any real employer or public authority.</span></div>';
+    document.getElementById('area').value='';document.getElementById('notes').value='';
+    n.dispatchEvent(new Event('input'));
+    renderMyReports();
+  });
+}
+function renderMyReports(){
+  const r=getReports();
+  document.getElementById('reportCount').textContent=r.length+' total';
+  const el=document.getElementById('myList');
+  if(r.length===0){
+    el.innerHTML='<li class="empty"><div class="empty-icon">⚠</div><h3>No reports yet</h3><p>Submit the form and your demo report will appear here.</p></li>';
+    return;
+  }
+  el.innerHTML=r.map(x=>`
+    <li style="border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff">
+      <div class="row">${badge(CATEGORY_LABEL[x.category],CATEGORY_CHIP[x.category])} ${badge(STATUS_LABEL[x.status],STATUS_CHIP[x.status])} ${badge(SEVERITY_LABEL[x.severity],SEVERITY_CHIP[x.severity])}</div>
+      <p style="font-size:13.5px;font-weight:600;margin-top:8px">${esc(x.area)}</p>
+      ${x.notes?'<p class="text-xs muted mt-2">'+esc(x.notes)+'</p>':''}
+      <p class="text-xs muted mt-2">${fmtDateTime(x.createdAt)} · <span style="font-family:monospace">${esc(x.id)}</span></p>
+    </li>`).join('');
+}
+
+/* ================== EMPLOYER ================== */
+const empState={cat:'all',stat:'all'};
+let empChart=null;
+function renderEmployer(){
+  const r=getReports();
+  const open=r.filter(x=>x.status==='open').length;
+  const prog=r.filter(x=>x.status==='in-progress').length;
+  const res=r.filter(x=>x.status==='resolved').length;
+  document.getElementById('empStats').innerHTML=`
+    <div class="stat"><div class="stat-top"><span class="stat-label">Facilities</span><span class="stat-icon" style="background:#eef7f6;color:#1a5250">🏢</span></div>
+      <div class="stat-value">${FACILITIES.length}</div><div class="stat-hint">Invented records</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Open</span><span class="stat-icon" style="background:#fef2f2;color:#dc2626">⚠</span></div>
+      <div class="stat-value">${open}</div><div class="stat-hint">Awaiting review</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Unresolved</span><span class="stat-icon" style="background:#fff8eb;color:#b74106">⚠</span></div>
+      <div class="stat-value">${open+prog}</div><div class="stat-hint">Open + in progress</div></div>
+    <div class="stat"><div class="stat-top"><span class="stat-label">Resolved</span><span class="stat-icon" style="background:#f0f8f1;color:#1f5c31">✅</span></div>
+      <div class="stat-value">${res}</div><div class="stat-hint">Marked done</div></div>`;
+  renderEmpChips();
+  renderEmpChart(r);
+  renderEmpList(r);
+}
+function renderEmpChips(){
+  const CATS=['missing-shade','no-water','cooling-closed','other'];
+  const STATS=['open','in-progress','resolved'];
+  const cc=document.getElementById('catChips');
+  cc.innerHTML='<button class="chip '+(empState.cat==='all'?'active':'')+'" data-c="all">All</button>'+
+    CATS.map(c=>'<button class="chip '+(empState.cat===c?'active':'')+'" data-c="'+c+'">'+CATEGORY_SHORT[c]+'</button>').join('');
+  cc.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{empState.cat=b.dataset.c;renderEmployer();}));
+  const sc=document.getElementById('statChips');
+  sc.innerHTML='<button class="chip '+(empState.stat==='all'?'active':'')+'" data-s="all">All</button>'+
+    STATS.map(s=>'<button class="chip '+(empState.stat===s?'active':'')+'" data-s="'+s+'">'+STATUS_LABEL[s]+'</button>').join('');
+  sc.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{empState.stat=b.dataset.s;renderEmployer();}));
+}
+function renderEmpChart(r){
+  const cv=document.getElementById('chart');
+  if(!cv||typeof Chart==='undefined')return;
+  const CATS=['missing-shade','no-water','cooling-closed','other'];
+  const COL={'missing-shade':'#1f5c31','no-water':'#0e7490','cooling-closed':'#2b817b','other':'#94a3b8'};
+  const data=CATS.map(c=>r.filter(x=>x.category===c).length);
+  const labels=CATS.map(c=>CATEGORY_SHORT[c]);
+  const colors=CATS.map(c=>COL[c]);
+  if(empChart){empChart.destroy();empChart=null;}
+  empChart=new Chart(cv.getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Reports',data,backgroundColor:colors,borderRadius:8,maxBarThickness:56}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:12},color:'#64748b'}},
+              y:{beginAtZero:true,ticks:{precision:0,font:{size:12},color:'#64748b'},grid:{color:'#e2e8f0'}}}}
+  });
+}
+function renderEmpList(r){
+  const f=r.filter(x=>(empState.cat==='all'||x.category===empState.cat)&&(empState.stat==='all'||x.status===empState.stat));
+  const s=sortByPriority(f);
+  document.getElementById('shownCount').textContent=s.length+' shown';
+  const el=document.getElementById('reportList');
+  if(s.length===0){
+    el.innerHTML='<li class="empty"><div class="empty-icon">⚠</div><h3>No reports match</h3><p>Try clearing the filters.</p></li>';
+    return;
+  }
+  el.innerHTML=s.map(x=>{
+    const p=scoreReport(x);
+    return `<li class="report-item">
+      <div class="report-main">
+        <div class="report-left">
+          <div class="report-tags">${badge(p.level+' priority',PRIORITY_CHIP[p.level])} ${badge(STATUS_LABEL[x.status],STATUS_CHIP[x.status])} <span class="text-xs muted">Score ${p.score}</span></div>
+          <p class="report-area">${esc(CATEGORY_LABEL[x.category])}</p>
+          <p class="text-sm" style="color:#334155;margin-top:4px">${esc(x.area)}</p>
+          <div class="report-tags mt-2">${badge(CATEGORY_LABEL[x.category],CATEGORY_CHIP[x.category])} ${badge('Severity '+SEVERITY_LABEL[x.severity],SEVERITY_CHIP[x.severity])} ${badge('Heat '+HEAT_LEVEL_LABEL[x.heatRiskAtReport],HEAT_LEVEL_CHIP[x.heatRiskAtReport])}</div>
+          <p class="report-meta">${fmtRelative(x.createdAt)} · ${fmtDateTime(x.createdAt)} · <span style="font-family:monospace">${esc(x.id)}</span></p>
+        </div>
+        <div class="report-actions">
+          <select class="input" style="width:auto;padding:7px 10px;font-size:12.5px" data-status="${x.id}">
+            ${['open','in-progress','resolved'].map(sv=>'<option value="'+sv+'"'+(x.status===sv?' selected':'')+'>'+STATUS_LABEL[sv]+'</option>').join('')}
+          </select>
+          <button class="icon-btn" data-del="${x.id}" title="Delete">🗑</button>
+        </div>
+      </div>
+      <button class="report-toggle" data-toggle="${x.id}">Why this priority? ▾</button>
+      <div class="report-details" data-details="${x.id}" style="display:none">
+        <ul>${p.reasons.map(r=>'<li>'+esc(r)+'</li>').join('')}</ul>
+        ${x.notes?'<p class="text-xs mt-3" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px"><b>Notes:</b> '+esc(x.notes)+'</p>':''}
+        <p class="text-xs muted mt-3">Rule-based prototype. Human verification required.</p>
+      </div>
+    </li>`;
+  }).join('');
+  el.querySelectorAll('[data-status]').forEach(sel=>sel.addEventListener('change',()=>{updateReportStatus(sel.dataset.status,sel.value);renderEmployer();}));
+  el.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>{if(confirm('Delete this demo report?')){deleteReportById(b.dataset.del);renderEmployer();}}));
+  el.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{
+    const box=el.querySelector('[data-details="'+b.dataset.toggle+'"]');
+    const shown=box.style.display!=='none';
+    box.style.display=shown?'none':'block';
+    b.textContent=shown?'Why this priority? ▾':'Why this priority? ▴';
+  }));
+}
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm('Reset all demo reports?')){resetReports();renderEmployer();}
+});
+
+/* ================== PRIORITY ================== */
+function renderPriority(){
+  const r=sortByPriority(getReports());
+  const el=document.getElementById('priorityList');
+  if(r.length===0){
+    el.innerHTML='<li class="empty"><div class="empty-icon">✨</div><h3>No reports to score yet</h3><p>Submit a report from the Report page.</p></li>';
+    return;
+  }
+  el.innerHTML=r.map(x=>{
+    const p=scoreReport(x);
+    return `<li class="card">
+      <div class="row">${badge(p.level+' · score '+p.score,PRIORITY_CHIP[p.level])} ${badge(CATEGORY_LABEL[x.category],CATEGORY_CHIP[x.category])} ${badge(STATUS_LABEL[x.status],STATUS_CHIP[x.status])}</div>
+      <p style="font-size:14px;font-weight:700;margin-top:10px">${esc(x.area)}</p>
+      <ul style="margin-top:10px;font-size:12.5px;color:#334155;display:flex;flex-direction:column;gap:6px">
+        ${p.reasons.map(r=>'<li style="display:flex;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#2b817b;flex-shrink:0;margin-top:7px"></span><span>'+esc(r)+'</span></li>').join('')}
+      </ul>
+    </li>`;
+  }).join('');
+}
+
+/* ================== BOOT ================== */
+injectSidebar();
+initReport();
+renderHome();
+renderFind();
+renderMyReports();
+
+window.addEventListener('coolstop:reports',()=>{renderHome();renderMyReports();renderEmployer();renderPriority();});
+window.addEventListener('storage',()=>{renderHome();renderMyReports();renderEmployer();renderPriority();});
+</script>
+</body>
+</html>
